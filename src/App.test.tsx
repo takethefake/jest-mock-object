@@ -1,44 +1,33 @@
 import React from "react";
 import { render } from "@testing-library/react";
+jest.mock("./config", () => jest.fn());
+import * as config from "./config";
+const mockConfig = (config as unknown) as jest.Mock;
 import App from "./App";
 
-/* 
-
-I'm currently only able to mock on per file level not on test level
-
-jest.mock("./config", () => ({
-  __esModule: true,
-  default: { greeting: true },
-}));
-*/
-
 describe("App", () => {
-  afterEach(() => {
+  beforeEach(async () => {
     jest.resetModules();
   });
-  it("renders bye if greeting false", () => {
-    jest.doMock("./config", () => ({
-      __esModule: true,
-      default: { greet: false },
+  it("renders bye if greeting false", async () => {
+    mockConfig.mockImplementation(() => ({
+      greet: false,
     }));
 
-    import("./App").then((module) => {
-      const { debug } = render(<module.default />);
-      debug();
-    });
-
-    // should render Bye user
+    const { debug, container } = render(<App />);
+    expect(container.querySelector("h1")?.textContent).toBe("Bye user");
+    //config is jest.fn()
+    debug();
   });
-  it("renders hello if greeting true", () => {
-    jest.doMock("./config", () => ({
-      __esModule: true,
-      default: { greet: true },
-    }));
-    import("./App").then((module) => {
-      const { debug } = render(<module.default />);
 
-      debug();
-    });
-    // should render Hello user
+  it("renders bye if greeting true", async () => {
+    mockConfig.mockImplementation(() => ({
+      greet: true,
+    }));
+
+    const { debug, container } = render(<App />);
+    expect(container.querySelector("h1")?.textContent).toBe("Hello user");
+    //config is jest.fn()
+    debug();
   });
 });
