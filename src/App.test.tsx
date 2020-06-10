@@ -1,6 +1,6 @@
-import App from "./App";
 import React from "react";
 import { render } from "@testing-library/react";
+import App from "./App";
 
 /* 
 
@@ -10,28 +10,35 @@ jest.mock("./config", () => ({
   __esModule: true,
   default: { greeting: true },
 }));
-
 */
 
 describe("App", () => {
-  it("renders hello if greeting true", () => {
-    jest.mock("./config", () => ({
-      __esModule: true,
-      default: { greeting: true },
-    }));
-    const { debug } = render(<App />);
-    // should render Hello user
-    debug();
+  afterEach(() => {
+    jest.resetModules();
   });
-
   it("renders bye if greeting false", () => {
-    jest.mock("./config", () => ({
+    jest.doMock("./config", () => ({
       __esModule: true,
-      default: { greeting: false },
+      default: { greet: false },
     }));
+
+    import("./App").then((module) => {
+      const { debug } = render(<module.default />);
+      debug();
+    });
 
     // should render Bye user
-    const { debug } = render(<App />);
-    debug();
+  });
+  it("renders hello if greeting true", () => {
+    jest.doMock("./config", () => ({
+      __esModule: true,
+      default: { greet: true },
+    }));
+    import("./App").then((module) => {
+      const { debug } = render(<module.default />);
+
+      debug();
+    });
+    // should render Hello user
   });
 });
