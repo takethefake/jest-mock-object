@@ -1,18 +1,17 @@
 import React from "react";
 import { render } from "@testing-library/react";
-jest.mock("./config", () => jest.fn());
+import { mocked } from "ts-jest/utils";
+jest.mock("./config", () => ({ __esModule: true, useConfig: jest.fn() }));
 import * as config from "./config";
-const mockConfig = (config as unknown) as jest.Mock;
+const mockConfig = mocked(config);
+
 import App from "./App";
 
 describe("App", () => {
-  beforeEach(async () => {
-    jest.resetModules();
-  });
   it("renders bye if greeting false", async () => {
-    mockConfig.mockImplementation(() => ({
+    mockConfig.useConfig.mockReturnValue({
       greet: false,
-    }));
+    });
 
     const { debug, container } = render(<App />);
     expect(container.querySelector("h1")?.textContent).toBe("Bye user");
@@ -21,9 +20,9 @@ describe("App", () => {
   });
 
   it("renders bye if greeting true", async () => {
-    mockConfig.mockImplementation(() => ({
+    mockConfig.useConfig.mockReturnValue({
       greet: true,
-    }));
+    });
 
     const { debug, container } = render(<App />);
     expect(container.querySelector("h1")?.textContent).toBe("Hello user");
