@@ -15,7 +15,12 @@ jest.mock("./config", () => ({
 
 describe("App", () => {
   it("renders hello if greeting true", () => {
+    jest.mock("./config", () => ({
+      __esModule: true,
+      default: { greeting: true },
+    }));
     const { debug } = render(<App />);
+    // should render Hello user
     debug();
   });
 
@@ -25,6 +30,7 @@ describe("App", () => {
       default: { greeting: false },
     }));
 
+    // should render Bye user
     const { debug } = render(<App />);
     debug();
   });
